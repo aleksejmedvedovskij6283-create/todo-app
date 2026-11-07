@@ -1,0 +1,51 @@
+@startuml
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+class Task {
+  +title: str
+  +deadline: str
+  +done: bool
+  +mark_done()
+  +__str__(): str
+}
+
+class TaskManager {
+  -tasks: list
+  -storage: Storage
+  +add_task(task: Task)
+  +remove_task(title: str)
+  +get_all(): list
+  +find_by_title(title: str): Task
+}
+
+abstract class Storage {
+  +load(): list
+  +save(tasks: list)
+}
+
+class FileStorage {
+  -filename: str
+  +load(): list
+  +save(tasks: list)
+}
+
+class MemoryStorage {
+  -tasks: list
+  +load(): list
+  +save(tasks: list)
+}
+
+class ConsoleUI {
+  -manager: TaskManager
+  +run()
+  +print_menu()
+  +print_tasks()
+}
+
+ConsoleUI --> TaskManager
+TaskManager o-- Task
+TaskManager ..> Storage
+Storage <|-- FileStorage
+Storage <|-- MemoryStorage
+@enduml
