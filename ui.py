@@ -42,8 +42,8 @@ class ConsoleUI:
         try:
             self.manager.add_task(title, deadline)
             print("Дело добавлено")
-        except ValueError as e:
-            print(f"Ошибка: {e}")
+        except ValueError as error:
+            print(f"Ошибка: {error}")
 
     def show_all(self):
         tasks = self.manager.get_all()
@@ -57,16 +57,16 @@ class ConsoleUI:
         try:
             self.manager.mark_done(title)
             print("Дело отмечено выполненным")
-        except ValueError as e:
-            print(f"Ошибка: {e}")
+        except ValueError as error:
+            print(f"Ошибка: {error}")
 
     def remove_flow(self):
         title = input("Название дела: ").strip()
         try:
             self.manager.remove_task(title)
             print("Дело удалено")
-        except ValueError as e:
-            print(f"Ошибка: {e}")
+        except ValueError as error:
+            print(f"Ошибка: {error}")
 
     def show_pending(self):
         tasks = self.manager.get_pending()

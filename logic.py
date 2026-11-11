@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 class Task:
     """Дело в списке дел."""
 
@@ -5,11 +8,22 @@ class Task:
         if not title or not title.strip():
             raise ValueError("Название дела не может быть пустым")
         self.title = title.strip()
+        try:
+            datetime.strptime(deadline, "%Y-%m-%d")
+        except (TypeError, ValueError):
+            raise ValueError("Срок должен быть в формате ГГГГ-ММ-ДД")
         self.deadline = deadline
         self.done = done
 
     def mark_done(self) -> None:
         self.done = True
+
+    def to_dict(self) -> dict:
+        return {"title": self.title, "deadline": self.deadline, "done": self.done}
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Task":
+        return cls(data["title"], data["deadline"], data.get("done", False))
 
     def __str__(self) -> str:
         status = "[x]" if self.done else "[ ]"
@@ -17,10 +31,19 @@ class Task:
 
 
 class TaskManager:
-    """Управляет списком дел."""
+    """Управляет списком дел; при необходимости использует слой Storage."""
 
-    def __init__(self):
+    def __init__(self, storage=None):
+        self.storage = storage
         self.tasks: list[Task] = []
+
+    def load(self) -> None:
+        if self.storage is not None:
+            self.tasks = self.storage.load()
+
+    def save(self) -> None:
+        if self.storage is not None:
+            self.storage.save(self.get_all())
 
     def add_task(self, title: str, deadline: str) -> Task:
         task = Task(title, deadline)
@@ -51,6 +74,8 @@ class TaskManager:
         return len(self.tasks)
 
     def find_by_title(self, fragment: str) -> list[Task]:
-        """Поиск дел, в названии которых есть подстрока (без учёта регистра)."""
         fragment = fragment.strip().lower()
         return [task for task in self.tasks if fragment in task.title.lower()]
+
+    def get_sorted_by_deadline(self) -> list[Task]:
+        return sorted(self.tasks, key=lambda task: task.deadline)
